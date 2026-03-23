@@ -45,4 +45,29 @@ interface interface_apb(input logic clk,reset);
   //monitor modport  
   modport MONITOR (clocking monitor_cb,input clk,reset);
   
+    
+    
+     
+  
+  property p_psel_then_penable;
+    @(posedge clk) disable iff (reset == 0)// Proprietate: Daca psel e activ, in urmatorul tact trebuie sa vina penable (faza de Setup -> Access)
+    	psel |=> penable;
+  endproperty
+
+  asertia_apb_setup_access: assert property (p_psel_then_penable)
+    	else $error("APB_ERR: PENABLE nu a activat dupa PSEL!");
+  apb_setup_access_C: cover property (p_psel_then_penable);
+
+
+  property p_penable_needs_psel;
+    @(posedge clk) disable iff (reset == 0)  // Proprietate: PENABLE nu poate fi 1 daca PSEL este 0
+    	penable |-> psel;
+  endproperty
+
+  asertia_apb_valid_enable: assert property (p_penable_needs_psel)
+    else $error("APB_ERR: PENABLE activat fara PSEL!");
+  apb_valid_enable_C: cover property (p_penable_needs_psel);
+    
+    
 endinterface
+    
