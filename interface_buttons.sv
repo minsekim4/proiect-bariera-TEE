@@ -28,4 +28,24 @@ interface interface_buttons(input logic clk, reset);
   modport DRIVER  (clocking driver_cb, input clk, reset);
   modport MONITOR (clocking monitor_cb, input clk, reset);
 
+    
+    
+    
+    
+    
+
+  property p_no_simultaneous_btns;
+    @(posedge clk) disable iff (reset == 0)// Proprietate: Nu se pot apasa ambele butoane in acelasi timp
+    !(btn_intrare && btn_iesire);
+  endproperty
+
+  asertia_butoane_mutuala: assert property (p_no_simultaneous_btns)
+    else $error("BUTTONS_ERR: Intrare si Iesire activate simultan!");
+  butoane_mutuala_C: cover property (p_no_simultaneous_btns);
+
+  
+  property p_sensor_active;
+    @(posedge clk) disable iff (reset == 0)// Proprietate: Daca senzorul de proximitate e activ, bariera ar trebui sa reactioneze (verificare logica)
+    senzor_prox |= house_is_occupied; //verificam daca senzorul produce un eveniment
+  endproperty
 endinterface
