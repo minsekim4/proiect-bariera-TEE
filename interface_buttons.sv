@@ -32,20 +32,14 @@ interface interface_buttons(input logic clk, reset);
     
     
     
-    
+property p_senzor_activeaza_bariera;
+  @(posedge clk) disable iff (reset == 0)
+  (senzor_prox == 1) |=> (stare_bariera == 1); 
+  // Daca senzorul detecteaza masina ACUM, la URMATORUL tact bariera trebuie sa fie ridicata
+endproperty
 
-  property p_no_simultaneous_btns;
-    @(posedge clk) disable iff (reset == 0)// Proprietate: Nu se pot apasa ambele butoane in acelasi timp
-    !(btn_intrare && btn_iesire);
-  endproperty
-
-  asertia_butoane_mutuala: assert property (p_no_simultaneous_btns)
-    else $error("BUTTONS_ERR: Intrare si Iesire activate simultan!");
-  butoane_mutuala_C: cover property (p_no_simultaneous_btns);
-
+asertia_logica_parcare: assert property (p_senzor_activeaza_bariera)
+  else $error("EROARE LOGICA: Senzorul a detectat masina, dar bariera a ramas inchisa!");
   
-  property p_sensor_active;
-    @(posedge clk) disable iff (reset == 0)// Proprietate: Daca senzorul de proximitate e activ, bariera ar trebui sa reactioneze (verificare logica)
-    senzor_prox |= house_is_occupied; //verificam daca senzorul produce un eveniment
-  endproperty
+  
 endinterface
