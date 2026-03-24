@@ -51,7 +51,7 @@ interface interface_apb(input logic clk,reset);
   
   property p_psel_then_penable;
     @(posedge clk) disable iff (reset == 0)// Proprietate: Daca psel e activ, in urmatorul tact trebuie sa vina penable (faza de Setup -> Access)
-    	psel |=> penable;
+    $rose(psel) |=> penable;
   endproperty
 
   asertia_apb_setup_access: assert property (p_psel_then_penable)
@@ -68,6 +68,13 @@ interface interface_apb(input logic clk,reset);
     else $error("APB_ERR: PENABLE activat fara PSEL!");
   apb_valid_enable_C: cover property (p_penable_needs_psel);
     
+    //cand psel=0, penable e 0 
+    // $fell(psel) Â- $fel(penable)
+    // $fell(pready) Â- $fel(psell)
+    // psel - $stable(paddr)
+    //psel && pwrite - $stable(paddr) && $stable(pwdata)
+    //rose (psel) Â !enable 
+    //uita-te la regulile din pdf
     
 endinterface
     

@@ -43,6 +43,5 @@ interface interface_output(input logic clk,reset);
   asertia_consistenta_stari: assert property (p_not_full_and_empty)
     else $error("OUTPUT_ERR: Eroare logica: Parcare plina si goala in acelasi timp!");
   consistenta_stari_C: cover property (p_not_full_and_empty);
-  
-  
+    
 endinterface
