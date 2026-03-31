@@ -1,4 +1,4 @@
-interface interface_buttons(input logic clk, reset);
+interface interface_buttons(input logic clk, reset, stare_bariera);
 
   // Declararea semnalelor fizice
   logic btn_intrare;
@@ -29,19 +29,21 @@ interface interface_buttons(input logic clk, reset);
   modport MONITOR (clocking monitor_cb, input clk, reset);
 
     
-    //daca butoanele sunt in 1, oricare din ele, atunci senzorul e in 1
-    
-    
-property p_senzor_activeaza_bariera;
-  @(posedge clk) disable iff (reset == 0)
-  (senzor_prox == 1) |=> (stare_bariera == 1); 
-  
-  
-  // Daca senzorul detecteaza masina ACUM, la URMATORUL tact bariera trebuie sa fie ridicata
-endproperty
+property butoanele_activeaza_senzorul;
+  @(posedge clk) disable iff(!reset)
+    (btn_intrare || btn_iesire) |-> (senzor_prox);//daca butoanele sunt in 1, oricare din ele, atunci senzorul e in 1
+endproperty    
+asertia_butoane1_senzor1: assert property (butoanele_activeaza_senzorul)
+  else $error("EROARE LOGICA: Buton apasat dar senzor = 0!");
+butoane1_senzor1_C: cover property(butoanele_activeaza_senzorul);
 
-asertia_logica_parcare: assert property (p_senzor_activeaza_bariera)
-  else $error("EROARE LOGICA: Senzorul a detectat masina, dar bariera a ramas inchisa!");
-  
+    
+property senzor_activeaza_bariera;
+  @(posedge clk) disable iff (!reset)
+    (senzor_prox) |=> (stare_bariera); // Daca senzorul detecteaza masina ACUM, la URMATORUL tact bariera trebuie sa fie ridicata
+endproperty
+asertia_senzor1_parcare1: assert property (senzor_activeaza_bariera)
+  else $error("EROARE LOGICA: Senzorul activ, dar bariera a ramas inchisa!");
+senzor1_parcare1_C: cover property(senzor_activeaza_bariera);
   
 endinterface
