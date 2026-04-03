@@ -68,7 +68,7 @@ interface interface_apb(input logic clk,reset);
     
 
   property psel_fall_penable_fall;
-    @(posedge clk) disable iff(!reset) //daca psel e 0, atunci si penable e 0
+    @(posedge clk) disable iff(!reset) //daca psel devine 0, atunci si penable devine 0
       $fell(psel) |-> $fell(penable);
   endproperty
   asertia_psel0_penable0: assert property (psel_fall_penable_fall)
@@ -77,7 +77,7 @@ interface interface_apb(input logic clk,reset);
   
 
   property pready_fall_psel_fall;
-    @(posedge clk) disable iff(!reset) // daca pready e 0 atunci si psel e 0
+    @(posedge clk) disable iff(!reset) // daca pready devine 0 atunci si psel devine 0
       $fell(pready) |-> $fell(psel);
   endproperty
   asertia_pready0_psel0: assert property (pready_fall_psel_fall)
@@ -87,13 +87,21 @@ interface interface_apb(input logic clk,reset);
 
   property paddr_stable_whilePSEL;
     @(posedge clk) disable iff(!reset) //adresa trebuie sa fie aceeasi pentru cand psel e activ, si sa se schimbe dupa
-      psel |-> $stable(paddr);
+      (psel && !pready) |-> $stable(paddr);
   endproperty
   asertia_stable_addr: assert property (paddr_stable_whilePSEL)
     else $error("APB_ERR: PADRR s-a schimbat in timpul tranzactiei active!");
   apb_stable_addr_C: cover property(paddr_stable_whilePSEL);  
 
-  
+  property pwrite_stable_whilePSEL;
+    @(posedge clk) disable iff(!reset) //pwrite trebuie sa fie acelasi pentru cand psel e activ, si sa se schimbe dupa
+      (psel && !pready) |-> $stable(pwrite);
+  endproperty
+  asertia_stable_addr: assert property (pwrite_stable_whilePSEL)
+    else $error("APB_ERR: PWRITE s-a schimbat in timpul tranzactiei active!");
+  apb_stable_addr_C: cover property(pwrite_stable_whilePSEL);  
+
+
   property pwrite_pwdataStable;
     @(posedge clk) disable iff(!reset) //pwdata sa fie aceasi cat timp e si psel si pwrite, adica cand scriem
       (psel && pwrite) |-> $stable(pwdata);

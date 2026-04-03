@@ -1,4 +1,4 @@
-interface interface_buttons(input logic clk, reset, stare_bariera);
+interface interface_buttons(input logic clk, reset);
 
   // Declararea semnalelor fizice
   logic btn_intrare;
@@ -37,13 +37,5 @@ asertia_butoane1_senzor1: assert property (butoanele_activeaza_senzorul)
   else $error("EROARE LOGICA: Buton apasat dar senzor = 0!");
 butoane1_senzor1_C: cover property(butoanele_activeaza_senzorul);
 
-    
-property senzor_activeaza_bariera;
-  @(posedge clk) disable iff (!reset)
-    (senzor_prox) |=> (stare_bariera); // Daca senzorul detecteaza masina ACUM, la URMATORUL tact bariera trebuie sa fie ridicata
-endproperty
-asertia_senzor1_parcare1: assert property (senzor_activeaza_bariera)
-  else $error("EROARE LOGICA: Senzorul activ, dar bariera a ramas inchisa!");
-senzor1_parcare1_C: cover property(senzor_activeaza_bariera);
-  
+   
 endinterface

@@ -45,6 +45,7 @@ class coverage_stimuli_externi;
     cross_btn_vs_ora: cross btn_cp, sistem_activ_cp {
       // Vrem să vedem neapărat că am încercat să intrăm și când e INACTIV (să vedem dacă bariera rămâne jos)
       bins incercare_inactiv = binsof(btn_cp) intersect {2'b01, 2'b10} && binsof(sistem_activ_cp.inactiv);
+     bins incercare_activ = binsof(btn_cp) intersect {2'b01, 2'b10} && binsof(sistem_activ_cp.activ);
     }
 
     // Scenariu: Am încercat să intrăm când parcarea era PLINĂ?
@@ -66,7 +67,6 @@ class coverage_stimuli_externi;
       bins farsa_iesire = binsof(senzor_cp.nimic_prezent) && binsof(btn_cp.iesire);
     }
 
-    //verificam daca 
   endgroup
 
   function new();

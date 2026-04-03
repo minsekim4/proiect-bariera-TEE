@@ -1,3 +1,4 @@
+//de verificat cu codul lui Nicu
 class button_transaction;
   rand bit button_input;
   rand bit button_output;
@@ -22,7 +23,7 @@ class button_transaction;
   
   // Daca butonul este apasat, masina trebuie sa fie prezenta
   constraint prox_c {
-    button_input | button_output -> senzor_proxim_i == 1;
+    dist { 0 := 65, 1 := 35 };
   }
 
 
