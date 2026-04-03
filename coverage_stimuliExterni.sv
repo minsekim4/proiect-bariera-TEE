@@ -9,7 +9,6 @@ class coverage_stimuli_externi;
   covergroup stimuli_cg;
     option.per_instance = 1;
 
-  // adaugati adresele tuturor registrilor pe care ii aveti in DUT (sunt documentati in specificatie)
   
     // 1. Acoperirea butoanelor (Intrare, Iesire, Nimic)
     btn_cp: coverpoint trans_covered.btn_i {
