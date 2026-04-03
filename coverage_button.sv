@@ -1,6 +1,6 @@
 //prin coverage, putem vedea ce situatii (de exemplu, ce tipuri de tranzactii) au fost generate in simulare; astfel putem masura stadiul la care am ajuns cu verificarea
 
-class coverage_stimuli_externi;
+class coverage_button;
   
     // Avem nevoie de un handle către tranzacția de butoane
   button_transaction trans_covered;
@@ -32,14 +32,24 @@ class coverage_stimuli_externi;
  
     // Scenariu: Am apasat si butonul de intrare si de iesire
     cross_btn_i_vs_btn_o: cross btn_input_cp, btn_output_cp {
-      //din varianta trecuta
-        //bins incercare_inactiv = binsof(btn_cp) intersect {2'b01, 2'b10} && binsof(sistem_activ_cp.inactiv);
-        //bins incercare_activ = binsof(btn_cp) intersect {2'b01, 2'b10} && binsof(sistem_activ_cp.activ);
+      bins apasat_intrare = binsof(btn_cp_input.intrare) && binsof(btn_cp_output.neapasat_o);
+      bins apasat_iesire = binsof(btn_cp_input.neapasat_i) && binsof(btn_cp_output.iesire);
+      bins apasat_ambele = binsof(btn_cp_input.intrare) && binsof(btn_cp_output.iesire);
     }
 
-    cross_
-
-
+    //Scenariu: Am apasat butonul de intrare si se activeaza senzorul
+    cross_btn_i_vs_senzor: cross btn_cp_input, senzor_cp{
+      bins intrare_valida = binsof(btn_cp_input.intrare) && binsof(senzor_cp.ceva_prezent);
+      bins intrare_gresita = binsof(btn_cp_input.intrare) && binsof(senzor_cp.nimic_prezent);
+      ignore_bins iesire_ignorata = binsof(btn_cp_output.iesire) ;
+    }
+    //Scenariu: Am apasat butonul de iesire si se activeaza senzorul
+    cross_btn_o_vs_senzor: cross btn_cp_input, senzor_cp{
+      bins iesire_valida = binsof(btn_cp_output.iesire) && binsof(senzor_cp.ceva_prezent);
+      bins iesire_gresita = binsof(btn_cp_output.iesire) && binsof(senzor_cp.nimic_prezent);
+      ignore_bins intrare_ignorata = binsof(btn_cp_input.intrare) ;       
+    }
+   
   endgroup
 
   function new();
@@ -56,4 +66,6 @@ class coverage_stimuli_externi;
     $display("[%0t] Coverage Stimuli: %.2f%%", $time, stimuli_cg.get_inst_coverage());
   endfunction
 
-endclass: coverage_stimuli_externi
+endclass: coverage_button
+
+   

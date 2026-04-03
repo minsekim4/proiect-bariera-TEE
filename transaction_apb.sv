@@ -2,13 +2,13 @@
 //						www.verificationguide.com 
 //-------------------------------------------------------------------------
 
-//aici se declara tipul de data folosit pentru a stoca datele vehiculate intre generator si driver; monitorul, de asemenea, preia datele de pe interfata, le recompune folosind un obiect al acestui tip de data, si numai apoi le proceseaza
-class apb_transaction;
+//aici se declara tipul de pwdata folosit pentru a stoca datele vehiculate intre generator si driver; monitorul, de asemenea, preia datele de pe interfata, le recompune folosind un obiect al acestui tip de pwdata, si numai apoi le proceseaza
+class transaction_apb;
   //se declara atributele clasei
   //campurile declarate cu cuvantul cheie rand vor primi valori aleatoare la aplicarea functiei randomize()
-  rand bit [7:0] addr;  
-  rand bit       wr_rd;
-  rand bit [7:0] data;
+  rand bit [7:0] paddr;  
+  rand bit       pwrite; // 1: scriere; 0: citire
+  rand bit [7:0] pwdata;
   rand int delay_between_transaction;
 
   
@@ -23,27 +23,27 @@ class apb_transaction;
   //aceasta functie afiseaza valorile aleatorizate ale atributelor clasei
   function void post_randomize();
   $display("--------- [Trans] post_randomize ------");
-  if(wr_rd) 
-    $display("\t addr  = %0h\t wr_rd = SCRIERE\t wdata = %0h \t delay = %0d", addr, data, delay_between_transaction);
+  if(pwrite) 
+    $display("\t paddr  = %0h\t pwrite = SCRIERE\t wpwdata = %0h \t delay = %0d", paddr, pwdata, delay_between_transaction);
   else 
-    $display("\t addr  = %0h\t rd_en = CITIRE  \t delay =  %0d", addr, delay_between_transaction);
+    $display("\t paddr  = %0h\t rd_en = CITIRE  \t delay =  %0d", paddr, delay_between_transaction);
   $display("-----------------------------------------");
 endfunction
   
   //operator de copiere a unui obiect intr-un alt obiect (deep copy)
-  function apb_transaction do_copy();
-    apb_transaction trans;
+  function transaction_apb do_copy();
+    transaction_apb trans;
     trans = new();
-    trans.addr  = this.addr;
-    trans.wr_rd = this.wr_rd;
-    trans.data = this.data;
+    trans.paddr  = this.paddr;
+    trans.pwrite = this.pwrite;
+    trans.pwdata = this.pwdata;
 	trans.delay_between_transaction = this.delay_between_transaction;
     return trans;
   endfunction
 endclass
 
 
-//paddresa, pwrite, data =>  difera la tranzactii == informatii reale
+//ppaddresa, pwrite, pwdata =>  difera la tranzactii == informatii reale
 
 
 //psel si penb arata doar daca se poate desfasura

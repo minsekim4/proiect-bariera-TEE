@@ -1,5 +1,6 @@
 module sistem_parcare #(parameter NR_TACTE_SENZOR = 8'd20,
-                                  TACTE_PER_ORA   = 8'd200
+                                  TACTE_PER_ORA   = 8'd200,
+                                  NR_TOTAL_LOCURI = 15
 )(
     //semnale generale
     input                clk_i,
@@ -21,19 +22,19 @@ module sistem_parcare #(parameter NR_TACTE_SENZOR = 8'd20,
     output reg           stare_bariera_o
 );
 
-assign pready_o         = 1'b1;
+assign pready_o = 1'b1;
 
 reg  [2:0]   stare_curenta;
 reg  [3:0]   nr_locuri_libere; //adresa: ...
-reg  [7:0]   counter;
+reg  [7:0]   counter_senzor;
 reg          intrare_iesire; // 1 == intrare, 0 == iesire
 reg  [4:0]   ora_curenta;
 reg  [7:0]   counter_ora; 
 reg  [4:0]   ora_start;
 reg  [4:0]   ora_stop;
 
-wire sistem_activ = (ora_curenta >= ora_start) && (ora_curenta < ora_stop);
-assign parcare_goala_o  = (nr_locuri_libere == 4'd15);
+wire   sistem_activ     = (ora_curenta >= ora_start) && (ora_curenta < ora_stop);
+assign parcare_goala_o  = (nr_locuri_libere == NR_TOTAL_LOCURI);
 assign parcare_plina_o  = (nr_locuri_libere == 4'd0);
 
 localparam IDLE        = 3'b000;
@@ -42,6 +43,7 @@ localparam ASTEAPTA    = 3'b010;
 localparam COBORARE    = 3'b011;
 localparam UPDATE      = 3'b100;
 
+//Logica FSM-ului
 always @(posedge clk_i or negedge rst_ni) begin
   if(~rst_ni)
       stare_curenta <= IDLE;
@@ -55,7 +57,7 @@ always @(posedge clk_i or negedge rst_ni) begin
               stare_curenta <= ASTEAPTA;
 
           ASTEAPTA:
-              if(counter >= NR_TACTE_SENZOR && ~senzor_proxim_i)
+              if(counter_senzor >= NR_TACTE_SENZOR && ~senzor_proxim_i)
                   stare_curenta <= COBORARE;
           
           COBORARE:
@@ -69,6 +71,7 @@ always @(posedge clk_i or negedge rst_ni) begin
       end
 end
 
+// counter_ora numara daca au trecut acele TACTE_PER_ORA pentru a se reseta dupa ce a trecut o ora
 always @(posedge clk_i or negedge rst_ni) begin
     if (~rst_ni)
         counter_ora <= 8'd0;
@@ -77,6 +80,7 @@ always @(posedge clk_i or negedge rst_ni) begin
          else counter_ora <= counter_ora + 1;
 end
 
+// ora_curenta creste cand au trecut acele TACTE_PER_ORA
 always @(posedge clk_i or negedge rst_ni) begin
     if (~rst_ni)
         ora_curenta <= 5'd0;
@@ -86,6 +90,7 @@ always @(posedge clk_i or negedge rst_ni) begin
             else ora_curenta <= ora_curenta + 1;
 end
 
+// se scrie prin APB ora de start si stop
 always @(posedge clk_i or negedge rst_ni) begin
     if (~rst_ni)
         ora_start <= 5'd8;
@@ -100,6 +105,7 @@ always @(posedge clk_i or negedge rst_ni) begin
             ora_stop <= pwdata_i[4:0];
 end
 
+// bariera este logic ridicata daca este in starea de ridicare sau daca asteapta dupa senzor
 always @(posedge clk_i or negedge rst_ni) begin
   if(~rst_ni)
     stare_bariera_o <= 0;
@@ -109,17 +115,19 @@ always @(posedge clk_i or negedge rst_ni) begin
                 stare_bariera_o <= 0;
 end
 
+// counter_senzor numara tactele pana la urmatoarea verificare a senzorului de proximitate
 always @(posedge clk_i or negedge rst_ni) begin
   if(~rst_ni)
-    counter <= 0;
+    counter_senzor <= 0;
   else if (stare_curenta == ASTEAPTA)
-    counter <= counter + 1;
-  else counter <= 0;
+    counter_senzor <= counter_senzor + 1;
+  else counter_senzor <= 0;
 end
 
+// nr_locuri_libere creste sau scade in functie de intrarea sau iesirea unei masini
 always @(posedge clk_i or negedge rst_ni) begin
   if(~rst_ni)
-    nr_locuri_libere <= 4'd10;
+    nr_locuri_libere <= 4'd15;
   else if (stare_curenta == UPDATE) 
           if (intrare_iesire)
              nr_locuri_libere <= nr_locuri_libere - 1'b1;
@@ -127,6 +135,7 @@ always @(posedge clk_i or negedge rst_ni) begin
              nr_locuri_libere <= nr_locuri_libere + 1'b1;   
 end
 
+// cand bariera e in IDLE, butoanele scriu in btn_i daca se intra sau se iese
 always @(posedge clk_i or negedge rst_ni) begin
   if(~rst_ni)
     intrare_iesire <= 0;
@@ -137,6 +146,7 @@ always @(posedge clk_i or negedge rst_ni) begin
                   intrare_iesire <= 0;
 end
 
+// se trece in prdata_o ce registrii se scriu in functie de adresa
 always @(posedge clk_i or negedge rst_ni) begin
   if (~rst_ni) 
       prdata_o <= 8'd0;

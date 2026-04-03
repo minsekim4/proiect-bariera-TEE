@@ -5,46 +5,40 @@
 //Samples the interface signals, captures into transaction packet and send the packet to scoreboard.
 
 //in macro-ul MON_IF se retine blocul de semnale de unde monitorul extrage datele
-`define MON_IF mem_vif.MONITOR.monitor_cb
-class monitor;
+`define MON_IF buttons_vif.MONITOR.monitor_cb
+class monitor_buttons;
   
   //creating virtual interface handle
-  virtual mem_intf mem_vif;
+  virtual interface_buttons buttons_vif;
   
   //se creaza portul prin care monitorul trimite scoreboardului datele colectate de pe interfata DUT-ului sub forma de tranzactii 
   //creating mailbox handle
   mailbox mon2scb;
+  coverage cvg;
   
   //cand se creaza obiectul de tip monitor (in fisierul environment.sv), interfata de pe care acesta colecteaza date este conectata la interfata reala a DUT-ului
   //constructor
-  function new(virtual mem_intf mem_vif,mailbox mon2scb);
+  function new(virtual interface_buttons buttons_vif,mailbox mon2scb);
     //getting the interface
     this.mem_vif = mem_vif;
     //getting the mailbox handles from  environment 
     this.mon2scb = mon2scb;
+    cvg = new();
   endfunction
+  
   
   //Samples the interface signal and send the sample packet to scoreboard
   task main;
     forever begin
       //se declara si se creaza obiectul de tip tranzactie care va contine datele preluate de pe interfata
-      transaction trans;
+      button_transaction trans;
       trans = new();
 
-      //datele sunt citite pe frontul de ceas, informatiile preluate de pe semnale fiind retinute in oboiectul de tip tranzactie
-      @(posedge mem_vif.MONITOR.clk iff `MON_IF.PREADY);
-      wait(`MON_IF.rd_en || `MON_IF.wr_en);
-        trans.addr  = `MON_IF.addr;
-        trans.wr_en = `MON_IF.wr_en;
-        trans.wdata = `MON_IF.wdata;
-        if(`MON_IF.rd_en) begin
-          trans.rd_en = `MON_IF.rd_en;
-          @(posedge mem_vif.MONITOR.clk);
-          @(posedge mem_vif.MONITOR.clk);
-          trans.rdata = `MON_IF.rdata;
-        end    
+      @(btn_intrare or btn_iesire or senzor_prox);
       // dupa ce s-au retinut informatiile referitoare la o tranzactie, continutul obiectului trans se trimite catre scoreboard
-        mon2scb.put(trans);
+      
+      mon2scb.put(trans);
+      cvg.sample(trans);
     end
   endtask
   
