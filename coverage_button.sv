@@ -41,13 +41,13 @@ class coverage_button;
     cross_btn_i_vs_senzor: cross btn_cp_input, senzor_cp{
       bins intrare_valida = binsof(btn_cp_input.intrare) && binsof(senzor_cp.ceva_prezent);
       bins intrare_gresita = binsof(btn_cp_input.intrare) && binsof(senzor_cp.nimic_prezent);
-      ignore_bins iesire_ignorata = binsof(btn_cp_output.iesire) ;
+     // ignore_bins iesire_ignorata = binsof(btn_cp_output.iesire) ;
     }
     //Scenariu: Am apasat butonul de iesire si se activeaza senzorul
-    cross_btn_o_vs_senzor: cross btn_cp_input, senzor_cp{
+    cross_btn_o_vs_senzor: cross btn_cp_output, senzor_cp{
       bins iesire_valida = binsof(btn_cp_output.iesire) && binsof(senzor_cp.ceva_prezent);
       bins iesire_gresita = binsof(btn_cp_output.iesire) && binsof(senzor_cp.nimic_prezent);
-      ignore_bins intrare_ignorata = binsof(btn_cp_input.intrare) ;       
+      //ignore_bins intrare_ignorata = binsof(btn_cp_input.intrare) ;       
     }
    
   endgroup
