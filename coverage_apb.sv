@@ -69,4 +69,4 @@ class coverage_apb;
     $display ("Operation type = %.2f%%", transaction_cg.operation_type_cp.get_coverage());
   endfunction
 
-endclass
+endclass : coverage_apb

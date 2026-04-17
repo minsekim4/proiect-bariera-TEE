@@ -72,4 +72,4 @@ class coverage;
     $display("Overall coverage = %.2f%%", output_transaction_cg.get_coverage());
   endfunction
 
-endclass : coverage
+endclass : coverage_iesire
