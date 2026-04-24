@@ -36,6 +36,9 @@ class coverage_stimuli_externi;
       bins activ   = {1};
       bins inactiv = {0};
     }
+	// 5. Acoperire funcționalitate LED-URI - ieșire și intrare
+		//se activeaza cel de intrare cand nr locuri parcare este 15 
+		//se activeaza si sta aprins cel de iesire cand cel de intrare nu e activ (nr locuri parcare este intre 0 si 15)
 
 // CROSS COVERAGE 
  // Vrem să vedem dacă am testat situațiile reale de utilizare:\
@@ -55,11 +58,6 @@ class coverage_stimuli_externi;
                                   binsof(senzor_cp.ceva_prezent);
     }
 
-    // Scenariu: avem masina la intrare si la iesire si se apasa butonul
-    cross_validare_fizica: cross btn_cp, senzor_cp {
-      bins intrare_corecta = binsof(btn_cp.intrare) && binsof(senzor_cp.ceva_prezent);
-      bins iesire_corecta  = binsof(btn_cp.iesire) && binsof(senzor_cp.ceva_prezent);
-    }
      
     // Verificăm farse: buton apasat fara masina la bariera
     cross_farsa: cross btn_cp, senzor_cp {
