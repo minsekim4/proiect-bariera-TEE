@@ -3,10 +3,10 @@
 //-------------------------------------------------------------------------
 
 `define NR_TOTAL_LOCURI 15
-class coverage;
+class coverage_iesire;
   
   
-  output_transaction trans_covered;
+  transaction_iesire trans_covered;
   
   
   covergroup output_transaction_cg;
@@ -59,7 +59,7 @@ class coverage;
 
 
   
-  task sample_function(output_transaction trans_covered);
+  task sample_function(transaction_iesire trans_covered);
     this.trans_covered = trans_covered;
     output_transaction_cg.sample();
   endtask

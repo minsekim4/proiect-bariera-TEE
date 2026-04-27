@@ -6,20 +6,21 @@ module sistem_parcare #(parameter NR_TACTE_SENZOR = 8'd20,
     input                clk_i,
     input                rst_ni,
 //semnale APB
-    input      [1:0]     paddr_i,
+    input       [1:0]    paddr_i,
     input                psel_i,
     input                penable_i,
     input                pwrite_i,
-    input      [7:0]     pwdata_i,
-    output reg [7:0]     prdata_o,
+    input       [7:0]    pwdata_i,
+    output reg  [7:0]    prdata_o,
     output               pready_o,
 // interfata cu stimuli din exterior
-    input      [1:0]     btn_i,
+    input       [1:0]    btn_i,
     input                senzor_proxim_i,
 // interfata de iesire
     output               parcare_plina_o,
     output               parcare_goala_o,
-    output reg           stare_bariera_o
+    output reg           stare_bariera_o,
+    output      [3:0]    nr_locuri_libere_o
 );
 
 assign pready_o = 1'b1;
@@ -34,8 +35,10 @@ reg  [4:0]   ora_start;
 reg  [4:0]   ora_stop;
 
 wire   sistem_activ     = (ora_curenta >= ora_start) && (ora_curenta < ora_stop);
+assign nr_locuri_libere_o = nr_locuri_libere;
 assign parcare_goala_o  = (nr_locuri_libere == NR_TOTAL_LOCURI);
 assign parcare_plina_o  = (nr_locuri_libere == 4'd0);
+
 
 localparam IDLE        = 3'b000;
 localparam RIDICARE    = 3'b001;
@@ -127,9 +130,9 @@ end
 // nr_locuri_libere creste sau scade in functie de intrarea sau iesirea unei masini
 always @(posedge clk_i or negedge rst_ni) begin
   if(~rst_ni)
-    nr_locuri_libere <= 4'd15;
+    nr_locuri_libere <= NR_TOTAL_LOCURI;
   else if (stare_curenta == UPDATE) 
-          if (intrare_iesire) 
+          if (intrare_iesire)
              nr_locuri_libere <= nr_locuri_libere - 1'b1;
           else 
              nr_locuri_libere <= nr_locuri_libere + 1'b1;   

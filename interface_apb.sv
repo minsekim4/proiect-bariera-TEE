@@ -1,6 +1,4 @@
-//-------------------------------------------------------------------------
-//						www.verificationguide.com
-//-------------------------------------------------------------------------
+
 //interfata APB
 
 interface interface_apb(input logic clk,reset);
@@ -97,9 +95,9 @@ interface interface_apb(input logic clk,reset);
     @(posedge clk) disable iff(!reset) //pwrite trebuie sa fie acelasi pentru cand psel e activ, si sa se schimbe dupa
       (psel && !pready) |-> $stable(pwrite);
   endproperty
-  asertia_stable_addr: assert property (pwrite_stable_whilePSEL)
+  asertia_stable_pwrite: assert property (pwrite_stable_whilePSEL)
     else $error("APB_ERR: PWRITE s-a schimbat in timpul tranzactiei active!");
-  apb_stable_addr_C: cover property(pwrite_stable_whilePSEL);  
+  apb_stable_pwrite_C: cover property(pwrite_stable_whilePSEL);  
 
 
   property pwrite_pwdataStable;

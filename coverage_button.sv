@@ -32,22 +32,20 @@ class coverage_button;
  
     // Scenariu: Am apasat si butonul de intrare si de iesire
     cross_btn_i_vs_btn_o: cross btn_input_cp, btn_output_cp {
-      bins apasat_intrare = binsof(btn_cp_input.intrare) && binsof(btn_cp_output.neapasat_o);
-      bins apasat_iesire = binsof(btn_cp_input.neapasat_i) && binsof(btn_cp_output.iesire);
-      bins apasat_ambele = binsof(btn_cp_input.intrare) && binsof(btn_cp_output.iesire);
+      bins apasat_intrare = binsof(btn_input_cp.intrare) && binsof(btn_output_cp.neapasat_o);
+      bins apasat_iesire = binsof(btn_input_cp.neapasat_i) && binsof(btn_output_cp.iesire);
+      bins apasat_ambele = binsof(btn_input_cp.intrare) && binsof(btn_output_cp.iesire);
     }
 
     //Scenariu: Am apasat butonul de intrare si se activeaza senzorul
-    cross_btn_i_vs_senzor: cross btn_cp_input, senzor_cp{
-      bins intrare_valida = binsof(btn_cp_input.intrare) && binsof(senzor_cp.ceva_prezent);
-      bins intrare_gresita = binsof(btn_cp_input.intrare) && binsof(senzor_cp.nimic_prezent);
-     // ignore_bins iesire_ignorata = binsof(btn_cp_output.iesire) ;
+    cross_btn_i_vs_senzor: cross btn_input_cp, senzor_cp{
+      bins intrare_valida = binsof(btn_input_cp.intrare) && binsof(senzor_cp.ceva_prezent);
+      bins intrare_gresita = binsof(btn_input_cp.intrare) && binsof(senzor_cp.nimic_prezent);
     }
     //Scenariu: Am apasat butonul de iesire si se activeaza senzorul
-    cross_btn_o_vs_senzor: cross btn_cp_output, senzor_cp{
-      bins iesire_valida = binsof(btn_cp_output.iesire) && binsof(senzor_cp.ceva_prezent);
-      bins iesire_gresita = binsof(btn_cp_output.iesire) && binsof(senzor_cp.nimic_prezent);
-      //ignore_bins intrare_ignorata = binsof(btn_cp_input.intrare) ;       
+    cross_btn_o_vs_senzor: cross btn_output_cp, senzor_cp{
+      bins iesire_valida = binsof(btn_output_cp.iesire) && binsof(senzor_cp.ceva_prezent);
+      bins iesire_gresita = binsof(btn_output_cp.iesire) && binsof(senzor_cp.nimic_prezent);      
     }
    
   endgroup
@@ -57,7 +55,7 @@ class coverage_button;
   endfunction
 
   // Metoda sample primește tranzacția de la Monitor
-  task sample(stimuli_transaction t);
+  task sample(button_transaction t);
     this.trans_covered = t;
     stimuli_cg.sample();
   endtask: sample
